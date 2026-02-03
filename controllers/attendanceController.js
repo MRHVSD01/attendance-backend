@@ -193,38 +193,103 @@ exports.getAttendance = async (req, res) => {
 //   res.json(s);
 // };
 
+// exports.simulateAttend = async (req, res) => {
+//   try {
+//     const { sessionId } = req.body;
+
+//     if (!sessionId) {
+//       return res.status(400).json({ error: "Session ID missing" });
+//     }
+
+//     const records = await Attendance.find({ sessionId });
+
+//     if (!records.length) {
+//       return res.status(404).json({ error: "No attendance found" });
+//     }
+
+//     for (const r of records) {
+//       r.attended += 1;
+//       r.total += 1;
+
+//       r.percentage = Number(((r.attended / r.total) * 100).toFixed(2));
+
+//       if (r.percentage < 65) r.riskLevel = "RED";
+//       else if (r.percentage < 75) r.riskLevel = "YELLOW";
+//       else r.riskLevel = "GREEN";
+
+//       await r.save();
+//     }
+
+//     res.json({ success: true });
+//   } catch (err) {
+//     console.error("SIMULATE ATTEND ERROR:", err);
+//     res.status(500).json({ error: "Simulate attend failed" });
+//   }
+// };
+
+// exports.simulateAttend = async (req, res) => {
+//   const { sessionId, subjectId } = req.body;
+
+//   if (!sessionId || !subjectId) {
+//     return res.status(400).json({ error: "Missing data" });
+//   }
+
+//   const s = await Attendance.findOne({ _id: subjectId, sessionId });
+
+//   if (!s) return res.status(404).json({ error: "Subject not found" });
+
+//   s.attended += 1;
+//   s.total += 1;
+//   s.percentage = Number(((s.attended / s.total) * 100).toFixed(2));
+
+//   if (s.percentage < 65) s.riskLevel = "RED";
+//   else if (s.percentage < 75) s.riskLevel = "YELLOW";
+//   else s.riskLevel = "GREEN";
+
+//   await s.save();
+
+//   res.json({ success: true });
+// };
+
 exports.simulateAttend = async (req, res) => {
-  try {
-    const { sessionId } = req.body;
+  const { sessionId, subjectId } = req.body;
 
-    if (!sessionId) {
-      return res.status(400).json({ error: "Session ID missing" });
-    }
-
-    const records = await Attendance.find({ sessionId });
-
-    if (!records.length) {
-      return res.status(404).json({ error: "No attendance found" });
-    }
-
-    for (const r of records) {
-      r.attended += 1;
-      r.total += 1;
-
-      r.percentage = Number(((r.attended / r.total) * 100).toFixed(2));
-
-      if (r.percentage < 65) r.riskLevel = "RED";
-      else if (r.percentage < 75) r.riskLevel = "YELLOW";
-      else r.riskLevel = "GREEN";
-
-      await r.save();
-    }
-
-    res.json({ success: true });
-  } catch (err) {
-    console.error("SIMULATE ATTEND ERROR:", err);
-    res.status(500).json({ error: "Simulate attend failed" });
+  if (!sessionId || !subjectId) {
+    return res.status(400).json({ error: "Missing data" });
   }
+
+  const subject = await Attendance.findOne({ _id: subjectId, sessionId });
+  if (!subject) return res.status(404).json({ error: "Subject not found" });
+
+  subject.attended += 1;
+  subject.total += 1;
+  subject.percentage = Number(((subject.attended / subject.total) * 100).toFixed(2));
+
+  subject.riskLevel =
+    subject.percentage < 65 ? "RED" :
+    subject.percentage < 75 ? "YELLOW" : "GREEN";
+
+  await subject.save();
+
+  // 🔥 compute aggregate AFTER update
+  const records = await Attendance.find({ sessionId });
+  let A = 0, T = 0;
+
+  records.forEach(r => {
+    A += r.attended;
+    T += r.total;
+  });
+
+  const aggregate = {
+    attended: A,
+    total: T,
+    percentage: Number(((A / T) * 100).toFixed(2)),
+    riskLevel:
+      (A / T) * 100 < 65 ? "RED" :
+      (A / T) * 100 < 75 ? "YELLOW" : "GREEN"
+  };
+
+  res.json({ subject, aggregate });
 };
 
 
@@ -256,39 +321,102 @@ exports.simulateAttend = async (req, res) => {
 //   res.json(s);
 // };
 
-exports.simulateMiss = async (req, res) => {
-  try {
-    const { sessionId } = req.body;
+// exports.simulateMiss = async (req, res) => {
+//   try {
+//     const { sessionId } = req.body;
 
-    if (!sessionId) {
-      return res.status(400).json({ error: "Session ID missing" });
-    }
+//     if (!sessionId) {
+//       return res.status(400).json({ error: "Session ID missing" });
+//     }
 
-    const records = await Attendance.find({ sessionId });
+//     const records = await Attendance.find({ sessionId });
 
-    if (!records.length) {
-      return res.status(404).json({ error: "No attendance found" });
-    }
+//     if (!records.length) {
+//       return res.status(404).json({ error: "No attendance found" });
+//     }
 
-    for (const r of records) {
-      r.total += 1;
+//     for (const r of records) {
+//       r.total += 1;
 
-      r.percentage = Number(((r.attended / r.total) * 100).toFixed(2));
+//       r.percentage = Number(((r.attended / r.total) * 100).toFixed(2));
 
-      if (r.percentage < 65) r.riskLevel = "RED";
-      else if (r.percentage < 75) r.riskLevel = "YELLOW";
-      else r.riskLevel = "GREEN";
+//       if (r.percentage < 65) r.riskLevel = "RED";
+//       else if (r.percentage < 75) r.riskLevel = "YELLOW";
+//       else r.riskLevel = "GREEN";
 
-      await r.save();
-    }
+//       await r.save();
+//     }
 
-    res.json({ success: true });
-  } catch (err) {
-    console.error("SIMULATE MISS ERROR:", err);
-    res.status(500).json({ error: "Simulate miss failed" });
+//     res.json({ success: true });
+//   } catch (err) {
+//     console.error("SIMULATE MISS ERROR:", err);
+//     res.status(500).json({ error: "Simulate miss failed" });
+//   }
+// };
+
+// exports.simulateMiss = async (req, res) => {
+//   const { sessionId, subjectId } = req.body;
+
+//   if (!sessionId || !subjectId) {
+//     return res.status(400).json({ error: "Missing data" });
+//   }
+
+//   const s = await Attendance.findOne({ _id: subjectId, sessionId });
+
+//   if (!s) return res.status(404).json({ error: "Subject not found" });
+
+//   s.total += 1;
+//   s.percentage = Number(((s.attended / s.total) * 100).toFixed(2));
+
+//   if (s.percentage < 65) s.riskLevel = "RED";
+//   else if (s.percentage < 75) s.riskLevel = "YELLOW";
+//   else s.riskLevel = "GREEN";
+
+//   await s.save();
+
+//   res.json({ success: true });
+// };
+
+exports.simulateMiss = async (req, res) =>{
+  const { sessionId, subjectId } = req.body;
+
+  if (!sessionId || !subjectId) {
+    return res.status(400).json({ error: "Missing data" });
   }
-};
 
+  const subject = await Attendance.findOne({ _id: subjectId, sessionId });
+  if (!subject) return res.status(404).json({ error: "Subject not found" });
+
+  // subject.attended += 1;
+  subject.total += 1;
+  subject.percentage = Number(((subject.attended / subject.total) * 100).toFixed(2));
+
+  subject.riskLevel =
+    subject.percentage < 65 ? "RED" :
+    subject.percentage < 75 ? "YELLOW" : "GREEN";
+
+  await subject.save();
+
+  // 🔥 compute aggregate AFTER update
+  const records = await Attendance.find({ sessionId });
+  let A = 0, T = 0;
+
+  records.forEach(r => {
+    A += r.attended;
+    T += r.total;
+  });
+
+  const aggregate = {
+    attended: A,
+    total: T,
+    percentage: Number(((A / T) * 100).toFixed(2)),
+    riskLevel:
+      (A / T) * 100 < 65 ? "RED" :
+      (A / T) * 100 < 75 ? "YELLOW" : "GREEN"
+  };
+
+  res.json({ subject, aggregate });
+}
 
 // =======================
 // TARGET PLANNING
