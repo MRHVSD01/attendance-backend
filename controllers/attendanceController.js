@@ -332,7 +332,7 @@ exports.targetPlan = async (req, res) => {
 //   }
 // };
 
-exports.getAggregate = async (req, res) => {
+exports.getAggregateAttendance = async (req, res) => {
   try {
     const sessionId = req.query.sessionId;
 
