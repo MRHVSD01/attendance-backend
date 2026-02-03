@@ -13,24 +13,27 @@ if (
   !controller.getAttendance ||
   !controller.simulateAttend ||
   !controller.simulateMiss ||
-  !controller.targetPlan
+  !controller.aggregateTargetPlan ||
+  !controller.getAggregateAttendance ||
+  !controller.resetAttendance
 ) {
   throw new Error(
     "One or more controller functions are not exported correctly"
   );
 }
 
+
 // ROUTES
 router.post("/upload", upload.any(), controller.uploadAttendance);
 router.get("/attendance", controller.getAttendance);
-router.get("/aggregate", controller.getAggregateAttendance);
-// router.get("/attendance/aggregate", controller.getAggregateAttendance);
-router.post("/target/aggregate", controller.aggregateTargetPlan);
 router.post("/simulate/attend", controller.simulateAttend);
 router.post("/simulate/miss", controller.simulateMiss);
-// router.post("/target/subject", controller.aggregateTargetPlan);
+router.get("/aggregate", controller.getAggregateAttendance);
+router.post("/target/aggregate", controller.aggregateTargetPlan);
 router.post("/attendance/reset", controller.resetAttendance);
 router.get("/attendance/safe-miss", controller.getSafeMissPerSubject);
+// router.get("/attendance/aggregate", controller.getAggregateAttendance);
+// router.post("/target/subject", controller.aggregateTargetPlan);
 
 
 module.exports = router;
