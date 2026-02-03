@@ -23,7 +23,8 @@ if (
 // ROUTES
 router.post("/upload", upload.any(), controller.uploadAttendance);
 router.get("/attendance", controller.getAttendance);
-router.get("/attendance/aggregate", controller.getAggregateAttendance);
+router.get("/aggregate", controller.getAggregateAttendance);
+// router.get("/attendance/aggregate", controller.getAggregateAttendance);
 router.post("/target/aggregate", controller.aggregateTargetPlan);
 router.post("/simulate/attend", controller.simulateAttend);
 router.post("/simulate/miss", controller.simulateMiss);
