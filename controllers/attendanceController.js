@@ -252,38 +252,84 @@ exports.targetPlan = async (req, res) => {
 // =======================
 // AGGREGATE ATTENDANCE
 // =======================
-exports.getAggregateAttendance = async (req, res) => {
-  const sessionId = getSessionId(req);
+// exports.getAggregateAttendance = async (req, res) => {
+//   const sessionId = getSessionId(req);
 
-  if (!sessionId) {
-    return res.status(400).json({ error: "Session ID missing" });
+//   if (!sessionId) {
+//     return res.status(400).json({ error: "Session ID missing" });
+//   }
+
+//   const records = await Attendance.find({ sessionId });
+
+//   let totalAttended = 0;
+//   let totalClasses = 0;
+
+//   records.forEach((r) => {
+//     totalAttended += r.attended;
+//     totalClasses += r.total;
+//   });
+
+//   const percentage =
+//     totalClasses === 0
+//       ? 0
+//       : Number(((totalAttended / totalClasses) * 100).toFixed(2));
+
+//   let riskLevel = "GREEN";
+//   if (percentage < 65) riskLevel = "RED";
+//   else if (percentage < 75) riskLevel = "YELLOW";
+
+//   res.json({
+//     totalAttended,
+//     totalClasses,
+//     percentage,
+//     riskLevel,
+//   });
+// };
+
+exports.getAggregate = async (req, res) => {
+  try {
+    const sessionId = req.query.sessionId;
+
+    if (!sessionId) {
+      return res.status(400).json({ error: "Session ID missing" });
+    }
+
+    const records = await Attendance.find({ sessionId });
+
+    if (!records.length) {
+      return res.json({
+        attended: 0,
+        total: 0,
+        percentage: 0,
+        riskLevel: "RED"
+      });
+    }
+
+    let totalAttended = 0;
+    let totalClasses = 0;
+
+    records.forEach(r => {
+      totalAttended += r.attended;
+      totalClasses += r.total;
+    });
+
+    const percentage = Number(((totalAttended / totalClasses) * 100).toFixed(2));
+
+    let riskLevel = "GREEN";
+    if (percentage < 65) riskLevel = "RED";
+    else if (percentage < 75) riskLevel = "YELLOW";
+
+    res.json({
+      attended: totalAttended,
+      total: totalClasses,
+      percentage,
+      riskLevel
+    });
+
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Aggregate calculation failed" });
   }
-
-  const records = await Attendance.find({ sessionId });
-
-  let totalAttended = 0;
-  let totalClasses = 0;
-
-  records.forEach((r) => {
-    totalAttended += r.attended;
-    totalClasses += r.total;
-  });
-
-  const percentage =
-    totalClasses === 0
-      ? 0
-      : Number(((totalAttended / totalClasses) * 100).toFixed(2));
-
-  let riskLevel = "GREEN";
-  if (percentage < 65) riskLevel = "RED";
-  else if (percentage < 75) riskLevel = "YELLOW";
-
-  res.json({
-    totalAttended,
-    totalClasses,
-    percentage,
-    riskLevel,
-  });
 };
 
 
