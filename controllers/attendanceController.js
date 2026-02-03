@@ -2,6 +2,11 @@ const Attendance = require("../models/Attendance");
 const csv = require("csv-parser");
 const fs = require("fs");
 
+
+function getSessionId(req) {
+  return req.body?.sessionId || req.query?.sessionId;
+}
+
 // =======================
 // UPLOAD / PASTE HANDLER
 // =======================
@@ -9,7 +14,7 @@ const fs = require("fs");
 exports.uploadAttendance = async (req, res) => {
   try {
 
-    const sessionId = req.body.sessionId || req.query.sessionId;
+    const sessionId = getSessionId(req);
 
     if (!sessionId) {
       return res.status(400).json({ error: "Session ID missing" });
@@ -70,7 +75,10 @@ exports.uploadAttendance = async (req, res) => {
           originalTotal: total,
           originalPercentage: percentage,
           originalRiskLevel: riskLevel,
+
+          sessionId, // ✅ REQUIRED
         });
+
       }
 
       return res.json({ success: true });
@@ -110,6 +118,7 @@ exports.uploadAttendance = async (req, res) => {
             total,
             percentage,
             riskLevel,
+            sessionId,
           });
         })
         .on("end", async () => {
@@ -134,7 +143,7 @@ exports.uploadAttendance = async (req, res) => {
 // =======================
 exports.getAttendance = async (req, res) => {
 
-  const sessionId = req.body.sessionId || req.query.sessionId;
+  const sessionId = getSessionId(req);
 
   if (!sessionId) {
     return res.status(400).json({ error: "Session ID missing" });
@@ -161,7 +170,7 @@ exports.getAttendance = async (req, res) => {
 exports.simulateAttend = async (req, res) => {
   const { id } = req.body;
 
-  const sessionId = req.body.sessionId || req.query.sessionId;
+  const sessionId = getSessionId(req);
 
   if (!sessionId) {
     return res.status(400).json({ error: "Session ID missing" });
@@ -190,7 +199,7 @@ exports.simulateAttend = async (req, res) => {
 exports.simulateMiss = async (req, res) => {
   const { id } = req.body;
 
-  const sessionId = req.body.sessionId || req.query.sessionId;
+  const sessionId = getSessionId(req);
 
   if (!sessionId) {
     return res.status(400).json({ error: "Session ID missing" });
@@ -218,7 +227,7 @@ exports.simulateMiss = async (req, res) => {
 exports.targetPlan = async (req, res) => {
   const { id, target } = req.body;
 
-  const sessionId = req.body.sessionId || req.query.sessionId;
+  const sessionId = getSessionId(req);
 
   if (!sessionId) {
     return res.status(400).json({ error: "Session ID missing" });
@@ -244,7 +253,7 @@ exports.targetPlan = async (req, res) => {
 // AGGREGATE ATTENDANCE
 // =======================
 exports.getAggregateAttendance = async (req, res) => {
-  const sessionId = req.body.sessionId || req.query.sessionId;
+  const sessionId = getSessionId(req);
 
   if (!sessionId) {
     return res.status(400).json({ error: "Session ID missing" });
@@ -288,7 +297,7 @@ exports.aggregateTargetPlan = async (req, res) => {
     return res.json({ type: "invalid", result: "Not achievable" });
   }
 
-  const sessionId = req.body.sessionId || req.query.sessionId;
+  const sessionId = getSessionId(req);
 
   if (!sessionId) {
     return res.status(400).json({ error: "Session ID missing" });
@@ -333,7 +342,7 @@ exports.aggregateTargetPlan = async (req, res) => {
 // =======================
 exports.resetAttendance = async (req, res) => {
 
-  const sessionId = req.body.sessionId || req.query.sessionId;
+  const sessionId = getSessionId(req);
 
   if (!sessionId) {
     return res.status(400).json({ error: "Session ID missing" });
@@ -357,7 +366,7 @@ exports.resetAttendance = async (req, res) => {
 // =======================
 exports.getSafeMissPerSubject = async (req, res) => {
 
-  const sessionId = req.body.sessionId || req.query.sessionId;
+  const sessionId = getSessionId(req);
 
   if (!sessionId) {
     return res.status(400).json({ error: "Session ID missing" });
