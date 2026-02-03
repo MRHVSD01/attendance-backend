@@ -286,6 +286,52 @@ exports.targetPlan = async (req, res) => {
 //   });
 // };
 
+// exports.getAggregate = async (req, res) => {
+//   try {
+//     const sessionId = req.query.sessionId;
+
+//     if (!sessionId) {
+//       return res.status(400).json({ error: "Session ID missing" });
+//     }
+
+//     const records = await Attendance.find({ sessionId });
+
+//     if (!records.length) {
+//       return res.json({
+//         attended: 0,
+//         total: 0,
+//         percentage: 0,
+//         riskLevel: "RED"
+//       });
+//     }
+
+//     let totalAttended = 0;
+//     let totalClasses = 0;
+
+//     records.forEach(r => {
+//       totalAttended += r.attended;
+//       totalClasses += r.total;
+//     });
+
+//     const percentage = Number(((totalAttended / totalClasses) * 100).toFixed(2));
+
+//     let riskLevel = "GREEN";
+//     if (percentage < 65) riskLevel = "RED";
+//     else if (percentage < 75) riskLevel = "YELLOW";
+
+//     res.json({
+//       attended: totalAttended,
+//       total: totalClasses,
+//       percentage,
+//       riskLevel
+//     });
+
+//   } catch (err) {
+//     console.error(err);
+//     res.status(500).json({ error: "Aggregate calculation failed" });
+//   }
+// };
+
 exports.getAggregate = async (req, res) => {
   try {
     const sessionId = req.query.sessionId;
@@ -296,7 +342,15 @@ exports.getAggregate = async (req, res) => {
 
     const records = await Attendance.find({ sessionId });
 
-    if (!records.length) {
+    let attended = 0;
+    let total = 0;
+
+    records.forEach(r => {
+      attended += r.attended || 0;
+      total += r.total || 0;
+    });
+
+    if (total === 0) {
       return res.json({
         attended: 0,
         total: 0,
@@ -305,30 +359,17 @@ exports.getAggregate = async (req, res) => {
       });
     }
 
-    let totalAttended = 0;
-    let totalClasses = 0;
-
-    records.forEach(r => {
-      totalAttended += r.attended;
-      totalClasses += r.total;
-    });
-
-    const percentage = Number(((totalAttended / totalClasses) * 100).toFixed(2));
+    const percentage = Number(((attended / total) * 100).toFixed(2));
 
     let riskLevel = "GREEN";
     if (percentage < 65) riskLevel = "RED";
     else if (percentage < 75) riskLevel = "YELLOW";
 
-    res.json({
-      attended: totalAttended,
-      total: totalClasses,
-      percentage,
-      riskLevel
-    });
+    res.json({ attended, total, percentage, riskLevel });
 
   } catch (err) {
-    console.error(err);
-    res.status(500).json({ error: "Aggregate calculation failed" });
+    console.error("Aggregate Error:", err);
+    res.status(500).json({ error: "Aggregate failed" });
   }
 };
 

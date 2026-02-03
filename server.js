@@ -6,9 +6,18 @@ const cors = require("cors");
 
 const app = express();
 
+const cors = require("cors");
+
 app.use(cors({
-  origin: "*"
+  origin: [
+    "https://attendance-frontend-ebon.vercel.app"
+  ],
+  methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+  allowedHeaders: ["Content-Type"],
 }));
+
+app.options("*", cors());
+
 app.use(express.json());
 
 mongoose
