@@ -293,29 +293,29 @@ exports.simulateMiss = async (req, res) => {
 // =======================
 // TARGET PLANNING
 // =======================
-exports.targetPlan = async (req, res) => {
-  const { id, target } = req.body;
+// exports.targetPlan = async (req, res) => {
+//   const { id, target } = req.body;
 
-  const sessionId = getSessionId(req);
+//   const sessionId = getSessionId(req);
 
-  if (!sessionId) {
-    return res.status(400).json({ error: "Session ID missing" });
-  }
+//   if (!sessionId) {
+//     return res.status(400).json({ error: "Session ID missing" });
+//   }
 
-  const s = await Attendance.find({ sessionId });
+//   const s = await Attendance.find({ sessionId });
 
-  if (target >= 100) {
-    return res.json({ result: "Not achievable" });
-  }
+//   if (target >= 100) {
+//     return res.json({ result: "Not achievable" });
+//   }
 
-  if (s.percentage >= target) {
-    return res.json({ result: 0 });
-  }
+//   if (s.percentage >= target) {
+//     return res.json({ result: 0 });
+//   }
 
-  const k = Math.ceil((target * s.total - 100 * s.attended) / (100 - target));
+//   const k = Math.ceil((target * s.total - 100 * s.attended) / (100 - target));
 
-  res.json({ result: k });
-};
+//   res.json({ result: k });
+// };
 
 
 // =======================

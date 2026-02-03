@@ -28,7 +28,7 @@ router.get("/aggregate", controller.getAggregateAttendance);
 router.post("/target/aggregate", controller.aggregateTargetPlan);
 router.post("/simulate/attend", controller.simulateAttend);
 router.post("/simulate/miss", controller.simulateMiss);
-router.post("/target/subject", controller.aggregateTargetPlan);
+// router.post("/target/subject", controller.aggregateTargetPlan);
 router.post("/attendance/reset", controller.resetAttendance);
 router.get("/attendance/safe-miss", controller.getSafeMissPerSubject);
 
