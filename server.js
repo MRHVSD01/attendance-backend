@@ -6,8 +6,6 @@ const cors = require("cors");
 
 const app = express();
 
-const cors = require("cors");
-
 app.use(cors({
   origin: [
     "https://attendance-frontend-ebon.vercel.app"
