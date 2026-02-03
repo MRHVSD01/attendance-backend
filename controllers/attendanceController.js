@@ -8,6 +8,12 @@ const fs = require("fs");
 
 exports.uploadAttendance = async (req, res) => {
   try {
+
+    const sessionId = req.body.sessionId || req.query.sessionId;
+
+    if (!sessionId) {
+      return res.status(400).json({ error: "Session ID missing" });
+    }
     // clear previous records
     console.log("REQ BODY:", req.body);
     // await Attendance.deleteMany({});
@@ -211,7 +217,7 @@ exports.simulateMiss = async (req, res) => {
 // =======================
 exports.targetPlan = async (req, res) => {
   const { id, target } = req.body;
-  
+
   const sessionId = req.body.sessionId || req.query.sessionId;
 
   if (!sessionId) {
