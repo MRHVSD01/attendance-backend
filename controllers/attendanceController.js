@@ -10,7 +10,9 @@ exports.uploadAttendance = async (req, res) => {
   try {
     // clear previous records
     console.log("REQ BODY:", req.body);
-    await Attendance.deleteMany({});
+    // await Attendance.deleteMany({});
+    await Attendance.deleteMany({ sessionId });
+
 
     // =======================
     // PASTE TEXT MODE
@@ -120,11 +122,19 @@ exports.uploadAttendance = async (req, res) => {
   }
 };
 
+
 // =======================
 // GET ATTENDANCE
 // =======================
 exports.getAttendance = async (req, res) => {
-  const data = await Attendance.find({});
+
+  const sessionId = req.body.sessionId || req.query.sessionId;
+
+  if (!sessionId) {
+    return res.status(400).json({ error: "Session ID missing" });
+  }
+
+  const data = await Attendance.find({ sessionId });
 
   const priority = { RED: 1, YELLOW: 2, GREEN: 3 };
 
@@ -144,7 +154,14 @@ exports.getAttendance = async (req, res) => {
 // =======================
 exports.simulateAttend = async (req, res) => {
   const { id } = req.body;
-  const s = await Attendance.findById(id);
+
+  const sessionId = req.body.sessionId || req.query.sessionId;
+
+  if (!sessionId) {
+    return res.status(400).json({ error: "Session ID missing" });
+  }
+
+  const s = await Attendance.find({ sessionId });
 
   if (!s) return res.status(404).json({ error: "Subject not found" });
 
@@ -160,12 +177,20 @@ exports.simulateAttend = async (req, res) => {
   res.json(s);
 };
 
+
 // =======================
 // SIMULATE MISS
 // =======================
 exports.simulateMiss = async (req, res) => {
   const { id } = req.body;
-  const s = await Attendance.findById(id);
+
+  const sessionId = req.body.sessionId || req.query.sessionId;
+
+  if (!sessionId) {
+    return res.status(400).json({ error: "Session ID missing" });
+  }
+
+  const s = await Attendance.find({ sessionId });
 
   if (!s) return res.status(404).json({ error: "Subject not found" });
 
@@ -180,12 +205,20 @@ exports.simulateMiss = async (req, res) => {
   res.json(s);
 };
 
+
 // =======================
 // TARGET PLANNING
 // =======================
 exports.targetPlan = async (req, res) => {
   const { id, target } = req.body;
-  const s = await Attendance.findById(id);
+  
+  const sessionId = req.body.sessionId || req.query.sessionId;
+
+  if (!sessionId) {
+    return res.status(400).json({ error: "Session ID missing" });
+  }
+
+  const s = await Attendance.find({ sessionId });
 
   if (target >= 100) {
     return res.json({ result: "Not achievable" });
@@ -200,11 +233,18 @@ exports.targetPlan = async (req, res) => {
   res.json({ result: k });
 };
 
+
 // =======================
 // AGGREGATE ATTENDANCE
 // =======================
 exports.getAggregateAttendance = async (req, res) => {
-  const records = await Attendance.find({});
+  const sessionId = req.body.sessionId || req.query.sessionId;
+
+  if (!sessionId) {
+    return res.status(400).json({ error: "Session ID missing" });
+  }
+
+  const records = await Attendance.find({ sessionId });
 
   let totalAttended = 0;
   let totalClasses = 0;
@@ -231,6 +271,7 @@ exports.getAggregateAttendance = async (req, res) => {
   });
 };
 
+
 // =======================
 // AGGREGATE TARGET PLAN (ADVANCED)
 // =======================
@@ -241,7 +282,13 @@ exports.aggregateTargetPlan = async (req, res) => {
     return res.json({ type: "invalid", result: "Not achievable" });
   }
 
-  const records = await Attendance.find({});
+  const sessionId = req.body.sessionId || req.query.sessionId;
+
+  if (!sessionId) {
+    return res.status(400).json({ error: "Session ID missing" });
+  }
+
+  const records = await Attendance.find({ sessionId });
 
   let A = 0;
   let T = 0;
@@ -274,11 +321,19 @@ exports.aggregateTargetPlan = async (req, res) => {
   });
 };
 
+
 // =======================
 // RESET ATTENDANCE
 // =======================
 exports.resetAttendance = async (req, res) => {
-  const records = await Attendance.find({});
+
+  const sessionId = req.body.sessionId || req.query.sessionId;
+
+  if (!sessionId) {
+    return res.status(400).json({ error: "Session ID missing" });
+  }
+
+  const records = await Attendance.find({ sessionId });
 
   for (const r of records) {
     r.attended = r.originalAttended;
@@ -295,7 +350,14 @@ exports.resetAttendance = async (req, res) => {
 // SUBJECT SAFE MISS
 // =======================
 exports.getSafeMissPerSubject = async (req, res) => {
-  const records = await Attendance.find({});
+
+  const sessionId = req.body.sessionId || req.query.sessionId;
+
+  if (!sessionId) {
+    return res.status(400).json({ error: "Session ID missing" });
+  }
+
+  const records = await Attendance.find({ sessionId });
 
   const result = records.map(s => {
     const A = s.attended;

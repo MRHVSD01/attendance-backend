@@ -39,6 +39,12 @@ const attendanceSchema = new mongoose.Schema({
     type: Date,
     default: Date.now,
   },
+  sessionId: {
+    type: String,
+    required: true,
+    index: true
+  },
+
 });
 
 module.exports = mongoose.model("Attendance", attendanceSchema);
