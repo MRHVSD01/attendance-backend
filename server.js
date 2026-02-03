@@ -14,8 +14,6 @@ app.use(cors({
   allowedHeaders: ["Content-Type"],
 }));
 
-app.options("*", cors());
-
 app.use(express.json());
 
 mongoose
