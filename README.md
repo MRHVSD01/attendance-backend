@@ -41,15 +41,15 @@ It handles attendance processing, calculations, simulations, and database storag
 
 ## 🔌 API Endpoints
 
-- | Method | Endpoint | Description |
-- |------|---------|------------|
-- | POST | /api/upload | Upload or paste attendance |
-- | GET | /api/attendance | Subject-wise attendance |
-- | GET | /api/aggregate | Aggregate attendance |
-- | POST | /api/simulate/attend | Simulate attend |
-- | POST | /api/simulate/miss | Simulate miss |
-- | POST | /api/target/aggregate | Target calculation |
-- | POST | /api/reset | Reset attendance |
+- | Method |       Endpoint       | Description |
+- |--------|----------------------|-------------|
+- | POST   | /api/upload          | Upload or paste attendance |
+- | GET    | /api/attendance      | Subject-wise attendance |
+- | GET    | /api/aggregate       | Aggregate attendance |
+- | POST   | /api/simulate/attend | Simulate attend |
+- | POST   | /api/simulate/miss   | Simulate miss |
+- | POST   | /api/target/aggregate | Target calculation |
+- | POST   | /api/reset           | Reset attendance |
 
 ---
 
@@ -65,7 +65,7 @@ It handles attendance processing, calculations, simulations, and database storag
 ## 🔐 Environment Variables
 
 Create a `.env` file:
-MONGO_URI=your_mongodb_atlas_connection_string
+MONGO_URI=your_mongodb_atlas_connection_string.
 PORT=5000
 
 ---
@@ -73,6 +73,6 @@ PORT=5000
 ## ▶️ Run Locally
 
 ```bash
-npm install
+npm install.
 node server.js
 
