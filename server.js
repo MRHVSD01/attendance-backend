@@ -58,16 +58,16 @@ app.use("/api", require("./routes/attendanceRoutes"));
 
 // const PORT = process.env.PORT || 5000;
 
-app.listen(PORT, () => {
-  console.log(`Server running on ${PORT}`);
-});
+// app.listen(PORT, () => {
+//   console.log(`Server running on ${PORT}`);
+// });
 
-const PORT = process.env.PORT || 8080;
-
-// Health Check Endpoint
 app.get("/", (req, res) => {
   res.status(200).send("Server is up and running!");
 });
+const PORT = process.env.PORT || 8080;
+
+// Health Check Endpoint
 
 // Explicitly listen on "0.0.0.0"
 app.listen(PORT, "0.0.0.0", () => {
