@@ -32,6 +32,11 @@ app.use("/api", require("./routes/attendanceRoutes"));
 
 const PORT = process.env.PORT || 8080;
 
+// Health Check Endpoint
+app.get("/", (req, res) => {
+  res.status(200).send("Server is up and running!");
+});
+
 // Explicitly listen on "0.0.0.0"
 app.listen(PORT, "0.0.0.0", () => {
   console.log(`Server running on port ${PORT}`);
